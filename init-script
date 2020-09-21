@@ -148,8 +148,10 @@ mount_stowaways() {
 
 		mount $DATA_PARTITION /data
 		mount --bind /data/${data_subdir}/.stowaways/${DEFAULT_OS} /target
-		mkdir /target/data # in new fs
-		mount --bind /data/${data_subdir} /target/data
+		# OP5: Stop mounting userdata to /data due to it causing (SELinux context) breakages on
+		#      Android side; mount it to /data/android with a userspace systemd unit instead.
+		mkdir -p /target/data/android # in new fs
+		#mount --bind /data/${data_subdir} /target/data
 	else
 		echo "Failed to mount /target, device node '$DATA_PARTITION' not found!" >> /diagnosis.log
 	fi
@@ -158,7 +160,7 @@ mount_stowaways() {
 
 umount_stowaways() {
 	if [ ! -z $DATA_PARTITION ]; then
-		umount /target/data
+		#umount /target/data
 		umount /target
 		umount /data
 	fi
